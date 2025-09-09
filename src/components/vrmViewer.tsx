@@ -33,11 +33,16 @@ export default function VrmViewer() {
             return;
           }
 
-          const file_type = file.name.split(".").pop();
+          const file_type = file.name.split(".").pop()?.toLowerCase();
+          const blob = new Blob([file], { type: "application/octet-stream" });
+          const url = window.URL.createObjectURL(blob);
+
           if (file_type === "vrm") {
-            const blob = new Blob([file], { type: "application/octet-stream" });
-            const url = window.URL.createObjectURL(blob);
             viewer.loadVrm(url);
+          } else if (file_type === "vrma") {
+            viewer.playVrma(url);
+          } else if (file_type === "fbx") {
+            viewer.playFbx(url);
           }
         });
       }
