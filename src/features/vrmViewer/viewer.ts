@@ -83,8 +83,6 @@ export class Viewer {
     const vrma = await loadVRMAnimation(url);
     if (vrma) {
       await this.model.loadAnimation(vrma);
-      // カメラ位置を再調整
-      requestAnimationFrame(() => this.resetCamera());
     }
   }
 
@@ -99,8 +97,6 @@ export class Viewer {
       const clip = await loadMixamoAnimation(url, this.model.vrm);
       if (clip) {
         await this.model.loadFbxAnimation(clip);
-        // カメラ位置を再調整
-        requestAnimationFrame(() => this.resetCamera());
       }
     } catch (error) {
       console.error("Failed to load FBX animation:", error);
