@@ -1,0 +1,17 @@
+[project]
+name = "chatvrm-examples"
+version = "0.1.0"
+description = "ChatVRM Python examples with podcast paging via PyAutoGUI"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "requests",
+  "websocket-client",
+  "loguru",
+  "pyautogui",
+  "tqdm",
+  "python-pptx",
+]
+
+[tool.uv]
+dev-dependencies = []

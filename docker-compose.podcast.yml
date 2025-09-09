@@ -12,11 +12,13 @@ services:
       - NODE_ENV=production
       - NEXT_PUBLIC_WS_URL=ws://localhost:8081
       - INTERNAL_WS_URL=ws://ws-server1:8080
-      - VOICEVOX_ENGINE_URL=${VOICEVOX_ENGINE_URL}
+      - VOICEVOX_ENGINE_URL=${VOICEVOX_ENGINE_URL:-http://host.docker.internal:50021}
       - NEXT_PUBLIC_VRM_FILENAME=/Kiyoka_20241223143815.vrm
-      - NEXT_PUBLIC_BG_IMAGE=/bg-d.png
+      - NEXT_PUBLIC_BG_IMAGE=/bg-g.png
     depends_on:
       - ws-server1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   nextjs2:
     build:
@@ -28,12 +30,14 @@ services:
       - NODE_ENV=production
       - NEXT_PUBLIC_WS_URL=ws://localhost:8082
       - INTERNAL_WS_URL=ws://ws-server2:8080
-      - VOICEVOX_ENGINE_URL=${VOICEVOX_ENGINE_URL}
+      - VOICEVOX_ENGINE_URL=${VOICEVOX_ENGINE_URL:-http://host.docker.internal:50021}
       - NEXT_PUBLIC_VRM_FILENAME=/Yukito_20250214233650.vrm
       - NEXT_PUBLIC_BG_IMAGE=/bg-g.png
     depends_on:
       - ws-server2
-      
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   ws-server1:
     build:
       context: .
