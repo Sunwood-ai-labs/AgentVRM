@@ -3,6 +3,7 @@ import { Model } from "./model";
 import { loadVRMAnimation } from "@/lib/VRMAnimation/loadVRMAnimation";
 import { buildUrl } from "@/utils/buildUrl";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { loadMixamoAnimation } from "@/lib/fbxAnimation/loadMixamoAnimation";
 
 /**
  * three.jsを使った3Dビューワー
@@ -39,30 +40,29 @@ export class Viewer {
     this._clock.start();
   }
 
-  public loadVrm(url: string) {
+  public async loadVrm(url: string) {
     if (this.model?.vrm) {
       this.unloadVRM();
     }
 
     // gltf and vrm
     this.model = new Model(this._camera || new THREE.Object3D());
-    this.model.loadVRM(url).then(async () => {
-      if (!this.model?.vrm) return;
+    await this.model.loadVRM(url);
+    if (!this.model?.vrm) return;
 
-      // Disable frustum culling
-      this.model.vrm.scene.traverse((obj) => {
-        obj.frustumCulled = false;
-      });
+    // Disable frustum culling
+    this.model.vrm.scene.traverse((obj) => {
+      obj.frustumCulled = false;
+    });
 
-      this._scene.add(this.model.vrm.scene);
+    this._scene.add(this.model.vrm.scene);
 
-      const vrma = await loadVRMAnimation(buildUrl("/idle_loop.vrma"));
-      if (vrma) this.model.loadAnimation(vrma);
+    const vrma = await loadVRMAnimation(buildUrl("/idle_loop.vrma"));
+    if (vrma) this.model.loadAnimation(vrma);
 
-      // HACK: アニメーションの原点がずれているので再生後にカメラ位置を調整する
-      requestAnimationFrame(() => {
-        this.resetCamera();
-      });
+    // HACK: アニメーションの原点がずれているので再生後にカメラ位置を調整する
+    requestAnimationFrame(() => {
+      this.resetCamera();
     });
   }
 
@@ -70,6 +70,40 @@ export class Viewer {
     if (this.model?.vrm) {
       this._scene.remove(this.model.vrm.scene);
       this.model?.unLoadVrm();
+    }
+  }
+
+  /**
+   * VRMAアニメーションを再生する (新規追加)
+   * @param url vrmaファイルのURL
+   */
+  public async playVrma(url: string) {
+    if (!this.model?.vrm) return;
+
+    const vrma = await loadVRMAnimation(url);
+    if (vrma) {
+      await this.model.loadAnimation(vrma);
+      // カメラ位置を再調整
+      requestAnimationFrame(() => this.resetCamera());
+    }
+  }
+
+  /**
+   * FBXアニメーションを再生する (新規追加)
+   * @param url fbxファイルのURL
+   */
+  public async playFbx(url: string) {
+    if (!this.model?.vrm) return;
+
+    try {
+      const clip = await loadMixamoAnimation(url, this.model.vrm);
+      if (clip) {
+        await this.model.loadFbxAnimation(clip);
+        // カメラ位置を再調整
+        requestAnimationFrame(() => this.resetCamera());
+      }
+    } catch (error) {
+      console.error("Failed to load FBX animation:", error);
     }
   }
 
