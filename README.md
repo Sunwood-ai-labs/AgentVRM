@@ -142,6 +142,9 @@ NEXT_PUBLIC_WS_URL=ws://localhost:8080
 
 # VOICEVOXエンジンのURL
 VOICEVOX_ENGINE_URL=http://localhost:50021
+
+# 初期モーションのファイル名（publicディレクトリからのパス、.vrmaまたは.fbx）
+# NEXT_PUBLIC_MOTION_FILENAME=/anim/Breathing Idle.fbx
 ```
 
 ### 5. WebSocketサーバー起動

@@ -15,6 +15,7 @@ export class Model {
   public mixer?: THREE.AnimationMixer;
   public emoteController?: EmoteController;
 
+  private _currentAction?: THREE.AnimationAction;
   private _lookAtTargetParent: THREE.Object3D;
   private _lipSync?: LipSync;
 
@@ -63,8 +64,39 @@ export class Model {
     }
 
     const clip = vrmAnimation.createAnimationClip(vrm);
-    const action = mixer.clipAction(clip);
-    action.play();
+    const newAction = mixer.clipAction(clip);
+
+    // 前のアニメーションがあれば、0.5秒かけてスムーズに切り替える
+    if (this._currentAction) {
+      this._currentAction.fadeOut(0.5);
+    }
+
+    // 新しいアニメーションを0.5秒かけて再生開始
+    newAction.reset().setLoop(THREE.LoopRepeat, Infinity).fadeIn(0.5).play();
+
+    this._currentAction = newAction;
+  }
+
+  /**
+   * FBXアニメーションクリップを読み込む (新規追加)
+   */
+  public async loadFbxAnimation(clip: THREE.AnimationClip): Promise<void> {
+    const { vrm, mixer } = this;
+    if (vrm == null || mixer == null) {
+      throw new Error("You have to load VRM first");
+    }
+
+    const newAction = mixer.clipAction(clip);
+
+    // 前のアニメーションがあれば、0.5秒かけてスムーズに切り替える
+    if (this._currentAction) {
+      this._currentAction.fadeOut(0.5);
+    }
+
+    // 新しいアニメーションを0.5秒かけて再生開始
+    newAction.reset().setLoop(THREE.LoopRepeat, Infinity).fadeIn(0.5).play();
+
+    this._currentAction = newAction;
   }
 
   /**

@@ -84,6 +84,15 @@ export default function Home() {
             await viewer.model!.speak(buffer.buffer, dummyScreenplay);
 
             setSubtitle(""); // 再生完了後に字幕を消す
+          } else if (messageData.type === 'play_animation' && messageData.name) {
+            // アニメーション再生メッセージを処理
+            const animation = messageData.name;
+            const fileType = animation.split('.').pop()?.toLowerCase();
+            if (fileType === 'vrma') {
+              viewer.playVrma(animation);
+            } else if (fileType === 'fbx') {
+              viewer.playFbx(animation);
+            }
           }
         } catch (error) {
           console.error("WebSocketメッセージの解析に失敗:", error);
