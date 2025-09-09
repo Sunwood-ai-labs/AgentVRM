@@ -1,8 +1,10 @@
 version: "3.9"
 
+
 services:
   voicevox_engine:
     image: voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+    # docker pull voicevox/voicevox_engine:nvidia-amd64-ubuntu22.04-0.25.0-dev
     ports:
       - "50021:50021"
     tty: true
