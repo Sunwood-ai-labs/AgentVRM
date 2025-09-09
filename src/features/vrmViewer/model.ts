@@ -15,6 +15,7 @@ export class Model {
   public mixer?: THREE.AnimationMixer;
   public emoteController?: EmoteController;
 
+  private _currentAction?: THREE.AnimationAction;
   private _lookAtTargetParent: THREE.Object3D;
   private _lipSync?: LipSync;
 
@@ -62,12 +63,18 @@ export class Model {
       throw new Error("You have to load VRM first");
     }
 
-    // アニメーションを切り替えるためにミキサーをリセット
-    this.mixer = new THREE.AnimationMixer(vrm.scene);
-
     const clip = vrmAnimation.createAnimationClip(vrm);
-    const action = this.mixer.clipAction(clip);
-    action.play();
+    const newAction = mixer.clipAction(clip);
+
+    // 前のアニメーションがあれば、0.5秒かけてスムーズに切り替える
+    if (this._currentAction) {
+      this._currentAction.fadeOut(0.5);
+    }
+
+    // 新しいアニメーションを0.5秒かけて再生開始
+    newAction.reset().setLoop(THREE.LoopRepeat, Infinity).fadeIn(0.5).play();
+
+    this._currentAction = newAction;
   }
 
   /**
@@ -79,11 +86,17 @@ export class Model {
       throw new Error("You have to load VRM first");
     }
 
-    // アニメーションを切り替えるためにミキサーをリセット
-    this.mixer = new THREE.AnimationMixer(vrm.scene);
+    const newAction = mixer.clipAction(clip);
 
-    const action = this.mixer.clipAction(clip);
-    action.play();
+    // 前のアニメーションがあれば、0.5秒かけてスムーズに切り替える
+    if (this._currentAction) {
+      this._currentAction.fadeOut(0.5);
+    }
+
+    // 新しいアニメーションを0.5秒かけて再生開始
+    newAction.reset().setLoop(THREE.LoopRepeat, Infinity).fadeIn(0.5).play();
+
+    this._currentAction = newAction;
   }
 
   /**
