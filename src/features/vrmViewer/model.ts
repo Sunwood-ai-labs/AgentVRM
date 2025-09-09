@@ -62,8 +62,27 @@ export class Model {
       throw new Error("You have to load VRM first");
     }
 
+    // アニメーションを切り替えるためにミキサーをリセット
+    this.mixer = new THREE.AnimationMixer(vrm.scene);
+
     const clip = vrmAnimation.createAnimationClip(vrm);
-    const action = mixer.clipAction(clip);
+    const action = this.mixer.clipAction(clip);
+    action.play();
+  }
+
+  /**
+   * FBXアニメーションクリップを読み込む (新規追加)
+   */
+  public async loadFbxAnimation(clip: THREE.AnimationClip): Promise<void> {
+    const { vrm, mixer } = this;
+    if (vrm == null || mixer == null) {
+      throw new Error("You have to load VRM first");
+    }
+
+    // アニメーションを切り替えるためにミキサーをリセット
+    this.mixer = new THREE.AnimationMixer(vrm.scene);
+
+    const action = this.mixer.clipAction(clip);
     action.play();
   }
 
