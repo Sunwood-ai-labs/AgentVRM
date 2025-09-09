@@ -57,8 +57,39 @@ export class Viewer {
 
     this._scene.add(this.model.vrm.scene);
 
-    const vrma = await loadVRMAnimation(buildUrl("/idle_loop.vrma"));
-    if (vrma) this.model.loadAnimation(vrma);
+    // 環境変数から初期モーションを読み込む
+    const motionFileName =
+      process.env.NEXT_PUBLIC_MOTION_FILENAME || "/idle_loop.vrma";
+    const motionUrl = buildUrl(motionFileName);
+    const fileType = motionFileName.split(".").pop()?.toLowerCase();
+
+    if (fileType === "vrma") {
+      const vrma = await loadVRMAnimation(motionUrl);
+      if (vrma) this.model.loadAnimation(vrma);
+    } else if (fileType === "fbx") {
+      try {
+        const clip = await loadMixamoAnimation(motionUrl, this.model.vrm);
+        if (clip) {
+          await this.model.loadFbxAnimation(clip);
+        }
+      } catch (error) {
+        console.error(
+          `Failed to load initial FBX animation: ${motionFileName}`,
+          error
+        );
+        // フォールバックとしてidle_loopを試す
+        const fallbackVrma = await loadVRMAnimation(
+          buildUrl("/idle_loop.vrma")
+        );
+        if (fallbackVrma) this.model.loadAnimation(fallbackVrma);
+      }
+    } else {
+      // デフォルトのアイドルモーションを読み込む
+      const defaultVrma = await loadVRMAnimation(
+        buildUrl("/idle_loop.vrma")
+      );
+      if (defaultVrma) this.model.loadAnimation(defaultVrma);
+    }
 
     // HACK: アニメーションの原点がずれているので再生後にカメラ位置を調整する
     requestAnimationFrame(() => {

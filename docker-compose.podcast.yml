@@ -14,6 +14,7 @@ services:
       - INTERNAL_WS_URL=ws://ws-server1:8080
       - VOICEVOX_ENGINE_URL=${VOICEVOX_ENGINE_URL:-http://host.docker.internal:50021}
       - NEXT_PUBLIC_VRM_FILENAME=/Kiyoka_20241223143815.vrm
+      - NEXT_PUBLIC_MOTION_FILENAME=/anim/Idle.fbx
       - NEXT_PUBLIC_BG_IMAGE=/bg-g.png
     depends_on:
       - ws-server1
@@ -32,6 +33,7 @@ services:
       - INTERNAL_WS_URL=ws://ws-server2:8080
       - VOICEVOX_ENGINE_URL=${VOICEVOX_ENGINE_URL:-http://host.docker.internal:50021}
       - NEXT_PUBLIC_VRM_FILENAME=/Yukito_20250214233650.vrm
+      - NEXT_PUBLIC_MOTION_FILENAME=/anim/Breathing Idle.fbx
       - NEXT_PUBLIC_BG_IMAGE=/bg-g.png
     depends_on:
       - ws-server2
