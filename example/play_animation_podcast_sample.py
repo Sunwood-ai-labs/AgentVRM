@@ -69,7 +69,7 @@ SPEAKER_ID_B = 1
 
 # =================== アニメーション関数 ===================
 # =================== 同時アニメーション関数 ===================
-def play_dual_animation(speaking_speaker: str, wait_duration: int = 3):
+def play_dual_animation(speaking_speaker: str, wait_duration: int):
     """
     話す人と喋ってない人で別々のアニメーションを同時再生
 
@@ -117,7 +117,7 @@ def play_dual_animation(speaking_speaker: str, wait_duration: int = 3):
 
     print(f"✅ 同時アニメーション完了")
 
-def play_single_animation(url: str, animation_path: str, description: str = "", wait_duration: int = 3):
+def play_single_animation(url: str, animation_path: str, description: str = ""):
     """
     単一キャラクターのアニメーション再生
 
@@ -168,7 +168,6 @@ actions = [
     {
         "type": "animation",
         "animation_path": "/idle_loop.vrma",
-        "animation_duration": 3,
         "description": "挨拶時のアニメーション"
     },
 
@@ -188,7 +187,6 @@ actions = [
     {
         "type": "animation",
         "animation_path": "/anim/Samba Dancing.fbx",
-        "animation_duration": 2,
         "description": "質問時のアニメーション"
     },
 
@@ -202,7 +200,6 @@ actions = [
     {
         "type": "animation",
         "animation_path": "/anim/Old Man Idle.fbx",
-        "animation_duration": 2,
         "description": "話題紹介時のアニメーション"
     },
 
@@ -222,7 +219,6 @@ actions = [
     {
         "type": "animation",
         "animation_path": "/anim/Wave Hip Hop Dance.fbx",
-        "animation_duration": 3,
         "description": "感想表明時のダンスアニメーション"
     },
 
@@ -256,7 +252,6 @@ actions = [
     {
         "type": "animation",
         "animation_path": "/idle_loop.vrma",
-        "animation_duration": 3,
         "description": "締めくくりのアニメーション"
     },
 ]
@@ -333,8 +328,8 @@ def main():
                 print(f"⏸️  [{speaker}] 音声再生中（同時アニメーション実行）... ({duration:.2f}秒)")
                 speech_duration = int(duration + 1)
 
-                # アニメーション再生時間に合わせて調整（音声再生時間に合わせる）
-                anim_duration = max(2, speech_duration - 1)  # 最低2秒、アニメーションを少し短めに
+                # アニメーション再生時間を音声長さに合わせる
+                anim_duration = speech_duration
 
                 # スレッドで同時アニメーション実行
                 anim_thread = threading.Thread(
@@ -358,19 +353,18 @@ def main():
         elif action["type"] == "animation":
             # ============ アニメーションアクション ============
             animation_path = action["animation_path"]
-            animation_duration = action.get("animation_duration", 3)
             description = action.get("description", "アニメーション")
 
             print(f"🎬 [アクション{i+1}] アニメーション変化: {description}")
-            print(f"  アニメーション: {animation_path} ({animation_duration}秒)")
+            print(f"  アニメーション: {animation_path}")
 
             # 全キャラクターの共通アニメーションとして再生（より強制的な制御が可能）
             if animation_path.endswith('.fbx'):
                 # 全キャラクター共通アニメーションとして再生
-                play_single_animation(ANIMATION_BASE_URL_A, animation_path, f"A_{description}", animation_duration)
+                play_single_animation(ANIMATION_BASE_URL_A, animation_path, f"A_{description}")
             else:
                 # VRMAの場合も同様
-                play_single_animation(ANIMATION_BASE_URL_A, animation_path, f"A_{description}", animation_duration)
+                play_single_animation(ANIMATION_BASE_URL_A, animation_path, f"A_{description}")
 
             print(f"✅ [アクション{i+1}] アニメーション完了: {description}")
 
