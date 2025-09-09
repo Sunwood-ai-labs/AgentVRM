@@ -14,27 +14,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // WebSocketサーバーにメッセージを送信
-  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
+  const wsUrl = process.env.INTERNAL_WS_URL || 'ws://localhost:8080'; // コンテナ間通信用のURLを使用
   const ws = new WebSocket(wsUrl + '?from=api'); // from=apiでAPIクライアントとして接続
 
   return new Promise((resolve) => {
     ws.onopen = () => {
       const message = JSON.stringify({
-        type: 'play-animation',
-        animation: animation,
+        type: 'play_animation',
+        name: animation,
       });
       ws.send(message);
       ws.close();
-      resolve(res.status(200).json({ success: true }));
+      resolve(res.status(200).json({ success: true, message: `Sent animation command: ${animation}` }));
     };
 
     ws.onerror = (error) => {
       console.error('WebSocket error in play_animation:', error);
-      resolve(res.status(500).json({ error: 'WebSocket connection failed' }));
+      // エラーメッセージを具体的にする
+      resolve(res.status(500).json({ error: 'WebSocket connection failed. Is the ws-server container running?', details: error.message }));
     };
 
     ws.onclose = () => {
-      // Already handled in onopen
+      // onopen と onerror で resolve されるので、ここでは何もしない
     };
   });
 }
