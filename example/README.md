@@ -8,18 +8,27 @@
 
 ```
 example/
+├── anim/
+│   ├── Old Man Idle.fbx
+│   └── Samba Dancing.fbx
 ├── assets/
 │   ├── out.wav
 │   ├── output_voicevox.wav
 │   ├── output_speak_text_1.wav
 │   ├── output_speak_text_2.wav
 │   ├── output_speak_text_3.wav
+│   ├── podcast_anim_A_1.wav
+│   ├── podcast_anim_B_1.wav
 │   └── sample-talk01.wav
+├── play_animation_api_sample.py
+├── play_animation_podcast_sample.py
+├── podcast_simulation.py
 ├── speak_text_api_sample.py
 ├── speak_text_conversation_sample.py
 ├── voicevox_api_sample.py
 ├── voicevox_tts_sample.py
 ├── ws_audio_sender.py
+├── pyproject.toml
 └── README.md
 ```
 
@@ -31,6 +40,9 @@ example/
 
 | ファイル名                        | 用途・説明 |
 |-----------------------------------|-----------|
+| `play_animation_api_sample.py`    | VRMアニメーション再生APIの使用例（VRMA/FBXアニメーションの再生） |
+| `play_animation_podcast_sample.py` | **新規**：ポッドキャスト会話中にアニメーションを連動再生（アニメーション＋音声の融合） |
+| `podcast_simulation.py`           | ポッドキャスト風会話のシミュレーション（音声生成＋ページ送りアクション） |
 | `speak_text_api_sample.py`        | テキストをPOSTするだけでVRMキャラクターがVOICEVOX音声で喋る（最もシンプル） |
 | `speak_text_conversation_sample.py` | 3回分のテキストを順に喋らせ、音声ファイルを保存・会話時間分待機・loguruで見やすいログ（レスポンスはキーのみ表示）|
 | `voicevox_api_sample.py`          | テキスト→音声ファイル生成→WebSocket送信でVRMが喋る（音声ファイルも保存） |
@@ -72,6 +84,24 @@ npm run dev
 
 ### 4. サンプルの実行例
 
+- VRMキャラクターにアニメーションを再生:
+
+  ```
+  python play_animation_api_sample.py
+  ```
+
+- **ポッドキャスト会話中にアニメーションを連動再生（新規）**:
+
+  ```
+  python play_animation_podcast_sample.py
+  ```
+
+- ポッドキャスト風会話のシミュレーション:
+
+  ```
+  python podcast_simulation.py
+  ```
+
 - VRMキャラクターにテキストだけで喋らせる（推奨）:
 
   ```
@@ -105,6 +135,20 @@ npm run dev
 - サーバーレスポンスはバイナリや長い値を出さず、キーのみをloguruで見やすく表示
 - 進行状況・エラーもloguruで整形
 - 依存パッケージ: `loguru`, `requests`
+
+---
+
+## 🎭 `play_animation_podcast_sample.py` の特徴
+
+- **アクション別実行方式**: 話すアクションとアニメーション変化を完全に分離し、独立して順次実行
+- **同時アニメーション機能**: 話すアクション中は自動で豊富なアニメーションを同時再生
+  - 話す人: Talkアニメーション（Talking1.fbx〜Talking3.fbx）をランダム選択
+  - 喋ってない人: Danceアニメーション（Samba Dancing, Swing Dancing, Wave Hip Hop Dance）をランダム選択
+- **視覚的に豊かな表現**: ため息やジェスチャーも一旦考えるほど奥行きのあるパフォーマンス
+- **カスタムアニメーション設定可能**: 各アクションで特定のアニメーションを指定可能（VRMA/FBX形式）
+- **プログレスバー表示**: アニメーションおよび音声再生の進行状況を視覚化
+- **生成音声自動保存**: `assets/podcast_anim_{A|B}_{番号}.wav`形式で保存
+- **依存パッケージ**: `requests`, `tqdm`, `random`, `threading`
 
 ---
 
