@@ -7,7 +7,7 @@ ChatVRM API /api/speak_text サンプル
 import requests
 
 # ChatVRMのAPIエンドポイント
-API_URL = "http://localhost:3001/api/speak_text"
+API_URL = "http://localhost:3002/api/speak_text"
 
 # 喋らせたいテキスト・話者ID・話速
 payload = {

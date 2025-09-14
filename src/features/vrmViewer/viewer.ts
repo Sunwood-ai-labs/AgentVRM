@@ -19,6 +19,7 @@ export class Viewer {
   private _scene: THREE.Scene;
   private _camera?: THREE.PerspectiveCamera;
   private _cameraControls?: OrbitControls;
+  private _initialHipsHeight: number = 0; // VRMモデルの初期の腰の高さを保存するプロパティ
 
   constructor() {
     this.isReady = false;
@@ -50,6 +51,22 @@ export class Viewer {
     await this.model.loadVRM(url);
     if (!this.model?.vrm) return;
 
+    // アニメーションを適用する前に、初期の腰の高さを計算して保存する
+    const vrm = this.model.vrm;
+    // updateMatrixWorldを呼ばないと正しいワールド座標が取れない
+    vrm.scene.updateMatrixWorld(true);
+    const vrmHipsNode = vrm.humanoid?.getNormalizedBoneNode('hips');
+    if (vrmHipsNode) {
+      const _vec3 = new THREE.Vector3();
+      const vrmHipsY = vrmHipsNode.getWorldPosition(_vec3).y;
+      const vrmRootY = vrm.scene.getWorldPosition(_vec3).y;
+      this._initialHipsHeight = Math.abs(vrmHipsY - vrmRootY);
+    } else {
+        // Hipsが見つからない場合は警告を出す
+        console.warn("Could not find Hips bone. Falling back to default height.");
+        this._initialHipsHeight = 1.0; // 仮のデフォルト値
+    }
+
     // Disable frustum culling
     this.model.vrm.scene.traverse((obj) => {
       obj.frustumCulled = false;
@@ -68,7 +85,7 @@ export class Viewer {
       if (vrma) this.model.loadAnimation(vrma);
     } else if (fileType === "fbx") {
       try {
-        const clip = await loadMixamoAnimation(motionUrl, this.model.vrm);
+        const clip = await loadMixamoAnimation(motionUrl, this.model.vrm, this._initialHipsHeight);
         if (clip) {
           await this.model.loadFbxAnimation(clip);
         }
@@ -125,7 +142,7 @@ export class Viewer {
     if (!this.model?.vrm) return;
 
     try {
-      const clip = await loadMixamoAnimation(url, this.model.vrm);
+      const clip = await loadMixamoAnimation(url, this.model.vrm, this._initialHipsHeight);
       if (clip) {
         await this.model.loadFbxAnimation(clip);
       }

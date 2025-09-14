@@ -6,9 +6,8 @@ type Props = {
   isChatProcessing: boolean;
   onChatProcessStart: (text: string) => void;
   onOpenSettings: () => void;
-  onOpenChatLog: () => void;
-  isChatLogOpen: boolean;
-  chatLogCount: number;
+  showSubtitle: boolean;
+  onToggleSubtitle: () => void;
   audioState: "suspended" | "running" | "closed" | "uninitialized";
 };
 
@@ -22,9 +21,8 @@ export const MessageInputContainer = ({
   isChatProcessing,
   onChatProcessStart,
   onOpenSettings,
-  onOpenChatLog,
-  isChatLogOpen,
-  chatLogCount,
+  showSubtitle,
+  onToggleSubtitle,
   audioState,
 }: Props) => {
   const [userMessage, setUserMessage] = useState("");
@@ -142,9 +140,8 @@ export const MessageInputContainer = ({
         onClickSendButton={handleClickSendButton}
         onAudioFileSelected={handleAudioFileSelected}
         onOpenSettings={onOpenSettings}
-        onOpenChatLog={onOpenChatLog}
-        isChatLogOpen={isChatLogOpen}
-        chatLogCount={chatLogCount}
+        showSubtitle={showSubtitle}
+        onToggleSubtitle={onToggleSubtitle}
         audioState={audioState}
       />
     </>
