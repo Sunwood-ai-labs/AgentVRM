@@ -68,3 +68,4 @@ coverage.xml
 *.cover
 .hypothesis/
 assets/
+public/anim/*.fbx
