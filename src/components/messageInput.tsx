@@ -19,12 +19,9 @@ type Props = {
   onClickSendButton: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onClickMicButton: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onAudioFileSelected?: (file: File) => void;
-
-  // ▼▼▼ コントロール用props ▼▼▼
   onOpenSettings: () => void;
-  onOpenChatLog: () => void;
-  isChatLogOpen: boolean;
-  chatLogCount: number;
+  showSubtitle: boolean;
+  onToggleSubtitle: () => void;
   audioState: "suspended" | "running" | "closed" | "uninitialized";
 };
 
@@ -37,9 +34,8 @@ export const MessageInput = ({
   onClickSendButton,
   onAudioFileSelected,
   onOpenSettings,
-  onOpenChatLog,
-  isChatLogOpen,
-  chatLogCount,
+  showSubtitle,
+  onToggleSubtitle,
   audioState,
 }: Props) => {
   const audioFileInputRef = useRef<HTMLInputElement>(null);
@@ -65,13 +61,17 @@ export const MessageInput = ({
           <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center">
             {/* 左側にアイコン群 */}
             <div className="flex items-center gap-2">
-              <IconButton iconName="24/Settings" isProcessing={false} onClick={onOpenSettings} title="設定" />
               <IconButton
-                iconName={isChatLogOpen ? "24/CommentOutline" : "24/CommentFill"}
+                iconName="24/Settings"
                 isProcessing={false}
-                disabled={chatLogCount <= 0}
-                onClick={onOpenChatLog}
-                title="会話ログ"
+                onClick={onOpenSettings}
+                title="設定"
+              />
+              <IconButton
+                iconName={showSubtitle ? "24/CommentFill" : "24/CommentOutline"}
+                isProcessing={false}
+                onClick={onToggleSubtitle}
+                title="字幕"
               />
               <span
                 title="GitHubリポジトリ"

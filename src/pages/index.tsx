@@ -13,8 +13,7 @@ import { KoeiroParam, DEFAULT_PARAM } from "@/features/constants/koeiroParam";
 import { getChatResponseStream } from "@/features/chat/openAiChat";
 import { Meta } from "@/components/meta";
 import { Settings } from "@/components/settings";
-import { ChatLog } from "@/components/chatLog";
-
+import { Menu } from "@/components/menu"; // Menuをインポート
 import { Subtitle } from "@/components/subtitle";
 export default function Home() {
   const { viewer } = useContext(ViewerContext);
@@ -28,13 +27,10 @@ export default function Home() {
   const [assistantMessage, setAssistantMessage] = useState("");
   const [isFirstInteraction, setIsFirstInteraction] = useState(true);
 
-  // ★ 字幕state追加
   const [subtitle, setSubtitle] = useState("");
+  const [showSubtitle, setShowSubtitle] = useState(true); // ★ 字幕表示state追加
 
-  // ▼▼▼ 追加: 設定・会話ログモーダルの状態管理 ▼▼▼
   const [showSettings, setShowSettings] = useState(false);
-  const [showChatLog, setShowChatLog] = useState(false);
-  // ▲▲▲
 
   // ▼▼▼ AudioContext状態監視用 ▼▼▼
   const [audioState, setAudioState] = useState<"suspended" | "running" | "closed" | "uninitialized">("uninitialized");
@@ -118,7 +114,6 @@ export default function Home() {
       );
       setSystemPrompt(params.systemPrompt ?? SYSTEM_PROMPT);
       setKoeiroParam(params.koeiroParam ?? DEFAULT_PARAM);
-      setChatLog(params.chatLog ?? []);
     }
   }, []);
 
@@ -126,21 +121,11 @@ export default function Home() {
     process.nextTick(() =>
       window.localStorage.setItem(
         "chatVRMParams",
-        JSON.stringify({ systemPrompt, koeiroParam, chatLog })
+        JSON.stringify({ systemPrompt, koeiroParam })
       )
     );
-  }, [systemPrompt, koeiroParam, chatLog]);
+  }, [systemPrompt, koeiroParam]);
 
-  const handleChangeChatLog = useCallback(
-    (targetIndex: number, text: string) => {
-      const newChatLog = chatLog.map((v: Message, i) => {
-        return i === targetIndex ? { role: v.role, content: text } : v;
-      });
-
-      setChatLog(newChatLog);
-    },
-    [chatLog]
-  );
 
   /**
    * 文ごとに音声を直列でリクエストしながら再生する
@@ -155,7 +140,7 @@ export default function Home() {
       // VOICEVOXで喋らせる
       speakCharacterWithVoicevox(screenplay, viewer, { speakerId: 1, speedScale: 1.0 }, onStart, onEnd);
     },
-    [viewer, koeiromapKey]
+    [viewer]
   );
 
   /**
@@ -288,36 +273,30 @@ export default function Home() {
     >
       <Meta />
       <VrmViewer />
-      {/* ★ 字幕コンポーネント追加 */}
-      <Subtitle text={subtitle} />
+      {showSubtitle && <Subtitle text={subtitle} />}
+      <Menu assistantMessage={assistantMessage} />
       <MessageInputContainer
         isChatProcessing={chatProcessing}
         onChatProcessStart={handleSendChat}
         onOpenSettings={() => setShowSettings(true)}
-        onOpenChatLog={() => setShowChatLog((v) => !v)}
-        isChatLogOpen={showChatLog}
-        chatLogCount={chatLog.length}
+        showSubtitle={showSubtitle}
+        onToggleSubtitle={() => setShowSubtitle((v) => !v)}
         audioState={audioState}
       />
-      {showSettings && (
+       {showSettings && (
         <Settings
           openAiKey={openAiKey}
-          chatLog={chatLog}
           systemPrompt={systemPrompt}
           koeiroParam={koeiroParam}
           koeiromapKey={koeiromapKey}
           onClickClose={() => setShowSettings(false)}
           onChangeAiKey={(e) => setOpenAiKey(e.target.value)}
           onChangeSystemPrompt={(e) => setSystemPrompt(e.target.value)}
-          onChangeChatLog={handleChangeChatLog}
           onChangeKoeiroParam={(x, y) => setKoeiroParam({ speakerX: x, speakerY: y })}
-          onClickOpenVrmFile={() => {}} // 必要に応じて実装
-          onClickResetChatLog={() => setChatLog([])}
           onClickResetSystemPrompt={() => setSystemPrompt(SYSTEM_PROMPT)}
           onChangeKoeiromapKey={(e) => setKoeiromapKey(e.target.value)}
         />
       )}
-      {showChatLog && <ChatLog messages={chatLog} />}
     </div>
   );
 }
